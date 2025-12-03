@@ -20,6 +20,12 @@ export default function InstallButton() {
   
   // Show button if current app is not installed yet
   const showButton = currentApp ? !installedApps[currentApp] : false;
+  
+  // Debug log
+  useEffect(() => {
+    console.log('Current app:', currentApp, 'Installed status:', installedApps);
+    console.log('Show button:', showButton);
+  }, [currentApp, installedApps, showButton]);
 
   useEffect(() => {
     // Check if we're in a browser environment
@@ -47,6 +53,12 @@ export default function InstallButton() {
       console.log('Install prompt not available');
       return;
     }
+    
+    // Immediately hide the button when clicked to prevent multiple clicks
+    setInstalledApps(prev => ({
+      ...prev,
+      [currentApp]: true
+    }));
 
     try {
       promptEvent.prompt();
@@ -54,11 +66,7 @@ export default function InstallButton() {
       
       if (choiceResult.outcome === 'accepted') {
         console.log('User accepted the install prompt');
-        // Mark only the current app as installed
-        setInstalledApps(prev => ({
-          ...prev,
-          [currentApp]: true
-        }));
+        // Already marked as installed when button was clicked
       } else {
         console.log('User dismissed the install prompt');
       }
@@ -67,7 +75,10 @@ export default function InstallButton() {
     }
   };
 
-  if (!showButton) return null;
+  if (!showButton) {
+    console.log('Not showing button for', currentApp);
+    return null;
+  }
 
   return (
     <button 
